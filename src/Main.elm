@@ -80,9 +80,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ 
-        img [ src "/logo.svg" ] []
-        , h1 [] [ text "My Elm App is working!" ]
-        , input [ placeholder "Start typing...", value model.streetAddress, onInput Change ] []
+        h1 [] [ text "Paack" ]
+        , input [ placeholder "Search...", value model.streetAddress, onInput Change ] []
         , div [] (List.map addressView model.suggestions)
         , div [] [ text ("Total results:" ++ String.fromInt (List.length model.suggestions))]
         , button [ style "background-color" "#00f"
