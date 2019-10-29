@@ -15,9 +15,12 @@ app.ports.predictAddress.subscribe(function (text) {
   var service = new google.maps.places.AutocompleteService();
   var options = { input: text, types: ['address'] }
   service.getPlacePredictions(options, function (predictions, status) {
-    console.log("predictions", predictions);
+    console.log("Got these results", predictions);
     // here predictions are sent back to Elm
-     // app.ports.addressPredictions.send(predictions);
+    if (predictions == null) {
+      app.ports.addressPredictions.send([]);
+      // Here I should have used Nothing but I don't know how for the moment
+    } else app.ports.addressPredictions.send(predictions);
   });
 });
 

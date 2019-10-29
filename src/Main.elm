@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser
 import ElmStreet.AutocompletePrediction exposing (AutocompletePrediction)
-import ElmStreet.Place exposing (ComponentType(..), Place, getComponentName)
+import ElmStreet.Place exposing (ComponentType(..), Place)
 
 import Html exposing (Html, text, div, h1, img, button, input)
 import Html.Attributes exposing (src, style, placeholder, value)
@@ -56,14 +56,14 @@ update msg model =
                     Decode.decodeValue ElmStreet.AutocompletePrediction.decodeList predictions
             in
             case decodedResult of
-                Ok suggestions ->
-                    ( { model | suggestions = suggestions }
+                Ok result ->
+                    ( { model | suggestions = result }
                     , Cmd.none
                     )
 
-                Err _ ->
+                Err e ->
                     ( model
-                    , Cmd.none
+                    , logger ("Got an error decoding:" ++ Decode.errorToString e)
                     )
 
 
@@ -84,6 +84,7 @@ view model =
         , h1 [] [ text "My Elm App is working!" ]
         , input [ placeholder "Start typing...", value model.streetAddress, onInput Change ] []
         , div [] (List.map addressView model.suggestions)
+        , div [] [ text ("Total results:" ++ String.fromInt (List.length model.suggestions))]
         , button [ style "background-color" "#00f"
                 , style "color" "#fff"
                 , onClick Reset
@@ -94,7 +95,11 @@ view model =
 
 
 ---- PROGRAM ----
-
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch [ addressPredictions AddressPredictions
+    -- addressDetails AddressDetails
+     ]
 
 main : Program () Model Msg
 main =
@@ -102,5 +107,5 @@ main =
         { view = view
         , init = \_ -> init
         , update = update
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }
