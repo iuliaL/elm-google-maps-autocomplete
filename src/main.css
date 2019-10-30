@@ -24,3 +24,50 @@ img {
   margin: 20px 0;
   max-width: 200px;
 }
+
+.error {
+  background-color: #ea382a;
+  color: white;
+  display: inline-block;
+  padding: 20px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%)
+}
+
+.view {
+  padding: 50px 20px;
+  margin: 40px 400px;
+  text-align: left;
+}
+
+input {
+    margin: 10px 0;
+    padding: 5px;
+    width: 350px;
+    display: inline-block;
+}
+
+.dropdown {
+  border: 1px solid #ddd;
+  position: relative;
+  top: -10px;
+  right: -1px;
+  width: 360px;
+}
+
+.dropdown > div {
+  padding: 5px;
+}
+
+button {
+  background-color: rgb(0, 137, 255);
+  color: rgb(255, 255, 255);
+  padding: 5px 20px;
+  font-size: 13px;
+  outline: none;
+  border: none;
+  margin: 10px 0;
+  vertical-align: middle;
+}

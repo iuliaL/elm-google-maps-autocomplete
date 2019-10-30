@@ -15,23 +15,25 @@ app.ports.predictAddress.subscribe(function (text) {
   var service = new google.maps.places.AutocompleteService();
   var options = { input: text, types: ['address'] }
   service.getPlacePredictions(options, function (predictions, status) {
-    console.log("Got these results", predictions);
+    console.log("Got these results", predictions, 'status', status);
     // here predictions are sent back to Elm
-    if (predictions == null) {
-      app.ports.addressPredictions.send([]);
-      // Here I should have used Nothing but I don't know how for the moment
-    } else app.ports.addressPredictions.send(predictions);
+    if (status == 'OK') {
+      app.ports.addressPredictions.send(predictions);
+    } else app.ports.addressPredictions.send(status);
   });
 });
 
 
-// app.ports.getPredictionDetails.subscribe(function (text) {
-//   var request = { placeId: text };
-//   var service = new google.maps.places.PlacesService(document.createElement('div'));
-//   service.getDetails(request, function (place, status) {
-//     app.ports.addressDetails.send(JSON.stringify(place));
-//   });
-// });
+app.ports.getPredictionDetails.subscribe(function (text) {
+  var request = { placeId: text };
+  var service = new google.maps.places.PlacesService(document.createElement('div'));
+  service.getDetails(request, function (place, status) {
+    console.log("Got this place", place, 'status', status);
+    if (status == 'OK') {
+      app.ports.addressPredictions.send(JSON.stringify(place));
+    } else app.ports.addressPredictions.send(status);
+  });
+});
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
