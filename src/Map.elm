@@ -1,27 +1,24 @@
 module Map exposing (..)
 
 
-type Model
-    = Internal
-        { latitude : Float
+type alias Model
+    = { latitude : Float
         , longtitude : Float
         }
 
 
 init : Model
 init =
-    Internal
         { latitude = 11.55408504200135
         , longtitude = 104.910961602369
         }
 
 
 modify : Float -> Float -> Model -> Model
-modify latitude longtitude (Internal model) =
-    Internal
+modify lat lng model =
         { model
-            | latitude = latitude
-            , longtitude = longtitude
+            | latitude = lat
+            , longtitude = lng
         }
 
 
@@ -32,7 +29,7 @@ type alias JsObject =
 
 
 toJsObject : Model -> JsObject
-toJsObject (Internal model) =
+toJsObject model =
     { lat = model.latitude
     , lng = model.longtitude
     }

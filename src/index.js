@@ -14,20 +14,20 @@ app.ports.logger.subscribe(message => {
 });
 
 app.ports.predictAddress.subscribe(function (text) {
-  // if (!text) { return; }
-  // var service = new google.maps.places.AutocompleteService();
-  // var options = { input: text, types: ['address'] }
-  // service.getPlacePredictions(options, function (predictions, status) {
-  //   console.log("Got these results", predictions, 'status', status);
+  if (!text) { return; }
+  var service = new google.maps.places.AutocompleteService();
+  var options = { input: text, types: ['address'] }
+  service.getPlacePredictions(options, function (predictions, status) {
+    console.log("Got these results", predictions, 'status', status);
 
-  //   if (status == 'OK') {
-  //     app.ports.addressPredictions.send(predictions);
-  //   } else app.ports.addressPredictions.send(status);
-  // });
+    if (status == 'OK') {
+      app.ports.addressPredictions.send(predictions);
+    } else app.ports.addressPredictions.send(status);
+  });
 
 
-  console.log("Got these predictions", mockedPredictions);
-  app.ports.addressPredictions.send(mockedPredictions);
+  // console.log("Got these predictions", mockedPredictions);
+  // app.ports.addressPredictions.send(mockedPredictions);
 
 
 });

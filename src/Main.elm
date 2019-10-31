@@ -85,11 +85,14 @@ update msg model =
             in
             case decodedResult of
                 Ok place ->
+                    let  { lat, lng } = place.geometry.location
+                    in
                     ( { model | streetAddress = place.formattedAddress
                     , selectedPlace = Just place
-                    , showMenu = False }
-                    , moveMap { lat =  place.geometry.location.lat
-                    , lng = place.geometry.location.lng}
+                    , showMenu = False
+                    , map = Map.modify lat lng model.map
+                    }
+                    , moveMap { lat = lat , lng = lng }
                     )
 
                 Err e ->
