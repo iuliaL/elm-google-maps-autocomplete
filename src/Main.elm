@@ -17,7 +17,6 @@ import Ports exposing (..)
 type alias Model =
     { streetAddress : String
     , suggestions : List AutocompletePrediction
-    , places: List Place
     , showMenu: Bool
     , preselectedPrediction: Maybe AutocompletePrediction
     , selectedPlace : Maybe Place
@@ -26,12 +25,10 @@ type alias Model =
 
 initialState = { streetAddress = ""
    , suggestions = []
-   , places = []
    , showMenu = False
+   , preselectedPrediction = Nothing -- here I wanted to implement keyboard events but ...
    , selectedPlace = Nothing
-   , preselectedPrediction = Nothing
    , error = Nothing
-
    }
 
 init : ( Model, Cmd Msg )
@@ -108,51 +105,6 @@ update msg model =
                     ( { model | error = Just error }
                     , logger ("Got an error decoding predictions:" ++ error)
                     )
-
-
--- dummyPrediction: AutocompletePrediction
--- dummyPrediction =  { description = "Description"
---     , id = "123"
---     , matcheSubstrings = []
---     , placeId = ""
---     , reference = "Ref"
---     , structuredFormatting = { mainText = ""
---     , mainTextPredictionSubstrings = []
---     , secondaryText = ""
---     }
---     , terms = []
---     , types = []
---     }
-
--- dummyPlaceForTheDefault: Place
--- dummyPlaceForTheDefault = { 
---     addressComponents = [ ]
---     , adrAddress = "Some address"
---     , formattedAddress = "Some formatted address"
---     , geometry = {
---         location = {
---             lat = 40.730610,
---             lng = -73.935242
---         },
---         viewport = 
---             { south = 0
---             , west = 0
---             , north = 0
---             , east = 0
---          }
-
---     }
---     , icon = "Icont here"
---     , id = "1234"
---     , name = "Dummy Place"
---     , placeId = "Dummy Place id"
---     , reference = "Ref"
---     , scope = "Scope"
---     , types = []
---     , url = "url here"
---     , utcOffset = 0
---     , vicinity = Nothing
---     }
 
 ---- VIEW ----
 addressView : AutocompletePrediction -> Html Msg

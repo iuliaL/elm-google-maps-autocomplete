@@ -47,6 +47,7 @@ input {
     padding: 5px;
     width: 350px;
     display: inline-block;
+    outline: none;
 }
 
 .dropdown {
