@@ -155,8 +155,7 @@ view : Model -> Html Msg
 view model =
     div [ class "view"]
         [
-        div [class "dropdown-wrapper"]
-        [ 
+        div [class "dropdown-wrapper"] [ 
              input [ placeholder "Search...", value model.streetAddress, onInput Change ] []
             , dropdownView model
         ]
