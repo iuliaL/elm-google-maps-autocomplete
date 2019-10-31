@@ -1,6 +1,11 @@
 
 ### Google places Autocomplete implementation with Elm.
 
+<kbd>
+  <img src="/shot.png?raw=true">
+</kbd>
+
+
 ### Resources
 1.  [Official Elm docs](https://guide.elm-lang.org/architecture/forms.html)
 
