@@ -4,7 +4,8 @@ import Json.Decode as Decode
 
 import Map
 
--- console logging
+-- Console logging
+
 port logger : String -> Cmd msg
 
 -- Outgoing Ports
@@ -15,7 +16,7 @@ port predictAddress : String -> Cmd msg
 port addressPredictions : (Decode.Value -> msg) -> Sub msg
 
 
-port getPredictionDetails : String -> Cmd msg
+port getPredictionDetails : String -> Cmd msg -- send 
 
 
 port addressDetails : (String -> msg) -> Sub msg

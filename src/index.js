@@ -25,8 +25,8 @@ app.ports.predictAddress.subscribe(function (text) {
 });
 
 
-app.ports.getPredictionDetails.subscribe(function (text) {
-  const request = { placeId: text };
+app.ports.getPredictionDetails.subscribe(function (placeId) {
+  const request = { placeId };
   const service = new google.maps.places.PlacesService(document.createElement('div'));
   service.getDetails(request, function (place, status) {
     console.log("Got this place", place, 'status', status);

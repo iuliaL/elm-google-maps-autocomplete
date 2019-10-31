@@ -58,7 +58,7 @@ input {
 .dropdown {
   border: 1px solid #ddd;
   position: absolute;
-  top: 37px;
+  top: 27px;
   width: 365px;
   font-size: 13px;
   background: white;
@@ -67,6 +67,10 @@ input {
 
 .dropdown > div {
   padding: 5px;
+}
+.dropdown > div:hover {
+  background: #efefef;
+  cursor: pointer;
 }
 
 button {

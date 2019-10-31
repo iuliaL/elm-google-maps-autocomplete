@@ -57,6 +57,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp -> (model, Cmd.none)
+
         Reset -> ( initialState , logger "Input was reset")
 
         Change text ->
@@ -129,7 +130,7 @@ errorView error =
     case error of
         Just e ->
             div [ class "error"]
-            [ text ("ERROR:" ++ e)]
+            [ text ("ERROR: " ++ e)]
         Nothing -> span [] []
 
 dropdownView : Model -> Html Msg
@@ -138,13 +139,16 @@ dropdownView model =
         div [class "dropdown"] (List.map addressView model.suggestions)
     else 
         span [] []
+
+
 placeInfoView: Model -> Html Msg
 placeInfoView model =
     case model.selectedPlace of
-    Just place ->
-        p [class "info"] [ text ("Current place: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++  (String.fromFloat <| model.map.lng) )]
-    Nothing ->
-        p [class "info", style "visibility" "hidden"] [text ("Current coordinates: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++  (String.fromFloat <| model.map.lng) )]
+        Just place ->
+            p [class "info"] [ text ("Current place: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++  (String.fromFloat <| model.map.lng) )]
+        Nothing ->
+            p [class "info", style "visibility" "hidden"]
+            [text ("Current coordinates: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++  (String.fromFloat <| model.map.lng) )]
 
 
 view : Model -> Html Msg
