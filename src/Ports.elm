@@ -24,4 +24,4 @@ port addressDetails : (String -> msg) -> Sub msg
 port initializeMap : Map.Model -> Cmd msg
 
 
-port moveMap : Map.Model -> Cmd msg
+port setPlace : Map.Model -> Cmd msg

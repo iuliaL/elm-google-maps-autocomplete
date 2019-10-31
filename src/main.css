@@ -35,9 +35,8 @@ body {
 }
 
 input {
-    margin: 10px 0;
     padding: 5px;
-    width: 350px;
+    width: 355px;
     display: inline-block;
     outline: none;
     margin-right: 10px;
@@ -50,18 +49,24 @@ input {
   color: #555;
 }
 
+.dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+
 .dropdown {
   border: 1px solid #ddd;
-  position: relative;
-  top: -10px;
-  width: 360px;
+  position: absolute;
+  top: 37px;
+  width: 365px;
   font-size: 13px;
-
+  background: white;
+  z-index: 1;
 }
 
 .dropdown > div {
   padding: 5px;
-
 }
 
 button {
@@ -69,11 +74,9 @@ button {
   color: rgb(255, 255, 255);
   padding: 5px 20px;
   border-radius: 3px;
-
   font-size: 12px;
   outline: none;
   border: 1px solid #ddd;
-  margin: 10px 0;
 }
 
 #map {

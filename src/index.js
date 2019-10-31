@@ -2,9 +2,6 @@ import './main.css';
 import { Elm } from './Main.elm';
 import * as serviceWorker from './serviceWorker';
 
-import mockedPredictions from './predictions.json'
-import mockedPlace from './place.json'
-
 const app = Elm.Main.init({
   node: document.getElementById('root')
 });
@@ -15,8 +12,8 @@ app.ports.logger.subscribe(message => {
 
 app.ports.predictAddress.subscribe(function (text) {
   if (!text) { return; }
-  var service = new google.maps.places.AutocompleteService();
-  var options = { input: text, types: ['address'] }
+  const service = new google.maps.places.AutocompleteService();
+  const options = { input: text, types: ['address'] }
   service.getPlacePredictions(options, function (predictions, status) {
     console.log("Got these results", predictions, 'status', status);
 
@@ -25,17 +22,12 @@ app.ports.predictAddress.subscribe(function (text) {
     } else app.ports.addressPredictions.send(status);
   });
 
-
-  // console.log("Got these predictions", mockedPredictions);
-  // app.ports.addressPredictions.send(mockedPredictions);
-
-
 });
 
 
 app.ports.getPredictionDetails.subscribe(function (text) {
-  var request = { placeId: text };
-  var service = new google.maps.places.PlacesService(document.createElement('div'));
+  const request = { placeId: text };
+  const service = new google.maps.places.PlacesService(document.createElement('div'));
   service.getDetails(request, function (place, status) {
     console.log("Got this place", place, 'status', status);
     if (status == 'OK') {
@@ -43,44 +35,36 @@ app.ports.getPredictionDetails.subscribe(function (text) {
     } else app.ports.addressDetails.send(status);
   });
 
-
-  // console.log("Got this place", mockedPlace);
-  // app.ports.addressDetails.send(JSON.stringify(mockedPlace));
-
 });
 
 app.ports.initializeMap.subscribe(function (pos) {
-  console.log("Initialize Map")
-  var mapDiv = document.getElementById('map');
-  console.log('position', pos);
+  const mapDiv = document.getElementById('map');
   if (mapDiv) {
-  // Map
-  var myLatlng = new google.maps.LatLng(pos);
-  var mapOptions = {
+    // Map
+    const myLatlng = new google.maps.LatLng(pos);
+    const mapOptions = {
       zoom: 15,
       center: myLatlng
-  };
-  var gmap = new google.maps.Map(mapDiv, mapOptions);
+    };
+    const gmap = new google.maps.Map(mapDiv, mapOptions);
 
-  // Marker
-  var marker = new google.maps.Marker({
-      position: myLatlng,
-      title: "Hello World!"
-  });
+    // Listening for set place event
+    app.ports.setPlace.subscribe(function (pos) {
 
-  marker.setMap(gmap);
+      const marker = new google.maps.Marker({
+        position: myLatlng,
+        title: "Hello World!"
+      });
 
-  // Listening for set marker event
-  app.ports.moveMap.subscribe(function (pos) {
-    console.log("received", pos);
-    var myLatlng = new google.maps.LatLng(pos);
-    gmap.setCenter(myLatlng);
-    marker.setPosition(myLatlng)
-  });
+      marker.setMap(gmap);
+      const myLatlng = new google.maps.LatLng(pos);
+      gmap.setCenter(myLatlng);
+      marker.setPosition(myLatlng)
+    });
 
   } else {
-    console.log ("Cant find map element");
-}
+    console.log("Cant find map element");
+  }
 });
 
 // If you want your app to work offline and load faster, you can change

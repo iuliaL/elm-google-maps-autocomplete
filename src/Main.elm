@@ -4,8 +4,8 @@ import Browser
 import ElmStreet.AutocompletePrediction exposing (AutocompletePrediction)
 import ElmStreet.Place exposing (ComponentType(..), Place)
 
-import Html exposing (Html, text, div, h1, img, button, input, span, p)
-import Html.Attributes exposing (src, style, placeholder, value, class, id)
+import Html exposing (Html, text, div, h1, button, input, span, p)
+import Html.Attributes exposing (src, placeholder, value, class, id, style)
 import Html.Events exposing (onInput, onClick)
 import Json.Decode as Decode
 
@@ -80,13 +80,14 @@ update msg model =
                 Ok place ->
                     let  { lat, lng } = place.geometry.location
                     in
-                    ( { model | streetAddress = place.formattedAddress
-                    , selectedPlace = Just place
-                    , showMenu = False
-                    , suggestions = []
-                    , map = Map.modify lat lng model.map
+                    ( { model |
+                        streetAddress = place.formattedAddress
+                        , selectedPlace = Just place
+                        , showMenu = False
+                        , suggestions = []
+                        , map = Map.modify lat lng model.map
                     }
-                    , moveMap { lat = lat , lng = lng }
+                    , setPlace { lat = lat , lng = lng }
                     )
 
                 Err e ->
@@ -137,18 +138,28 @@ dropdownView model =
         div [class "dropdown"] (List.map addressView model.suggestions)
     else 
         span [] []
+placeInfoView: Model -> Html Msg
+placeInfoView model =
+    case model.selectedPlace of
+    Just place ->
+        p [class "info"] [ text ("Current place: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++  (String.fromFloat <| model.map.lng) )]
+    Nothing ->
+        p [class "info", style "visibility" "hidden"] [text ("Current coordinates: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++  (String.fromFloat <| model.map.lng) )]
+
 
 view : Model -> Html Msg
 view model =
     div [ class "view"]
+        [
+        div [class "dropdown-wrapper"]
         [ 
-        h1 [] [ text "Places" ]
-        , input [ placeholder "Search...", value model.streetAddress, onInput Change ] []
+             input [ placeholder "Search...", value model.streetAddress, onInput Change ] []
+            , dropdownView model
+        ]
         , button [ onClick Reset ][ text "Reset" ]
-        , dropdownView model
         , errorView model.error
         -- , p [class "info"] [ text ("Total results: " ++ String.fromInt (List.length model.suggestions))]
-        , p [class "info"] [ text ("Current place: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++  (String.fromFloat <| model.map.lng) )]
+        , placeInfoView model
         , div []
             [ div [ id "map" ] []
             ]
