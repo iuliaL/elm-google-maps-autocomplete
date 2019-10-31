@@ -21,17 +21,7 @@ port getPredictionDetails : String -> Cmd msg
 port addressDetails : (String -> msg) -> Sub msg
 
 
-port initializeMap : Map.JsObject -> Cmd msg
+port initializeMap : Map.Model -> Cmd msg
 
 
--- port initializeEditMap : Map.JsObject -> Cmd msg
-
-
-port moveMap : Map.JsObject -> Cmd msg
-
-
-
--- Incoming Port
-
---  this was not requested
--- port mapMoved : (Map.JsObject -> msg) -> Sub msg
+port moveMap : Map.Model -> Cmd msg

@@ -38,7 +38,6 @@ init : ( Model, Cmd Msg )
 init =
    ( initialState
    , Map.init
-        |> Map.toJsObject
         |> Ports.initializeMap )
 
 
@@ -49,7 +48,6 @@ type Msg
     = Change String
     | AddressPredictions Decode.Value
     | DidSelectAddress String
-    | SetMapMarker Map.JsObject
     | AddressDetails String
     | Reset
     | NoOp
@@ -72,11 +70,6 @@ update msg model =
             , getPredictionDetails placeId
             )
 
-        SetMapMarker { lat, lng } ->
-            ( { model | map = Map.modify lat lng model.map }
-            , Cmd.none
-            )
-
         -- here we decode the suggestion into a Place then call the map move and set the marker
         AddressDetails placeJson ->
             let
@@ -90,6 +83,7 @@ update msg model =
                     ( { model | streetAddress = place.formattedAddress
                     , selectedPlace = Just place
                     , showMenu = False
+                    , suggestions = []
                     , map = Map.modify lat lng model.map
                     }
                     , moveMap { lat = lat , lng = lng }
@@ -153,9 +147,8 @@ view model =
         , button [ onClick Reset ][ text "Reset" ]
         , dropdownView model
         , errorView model.error
-        , p [class "info"] [ text ("Total results: " ++ String.fromInt (List.length model.suggestions))]
-        , p [class "info"] [ text ("Current place latitude: " ++ (String.fromFloat <| .lat <| Map.toJsObject model.map) )]
-        , p [class "info"] [ text ("Current place longitude: " ++ (String.fromFloat <| .lng <| Map.toJsObject model.map) )]
+        -- , p [class "info"] [ text ("Total results: " ++ String.fromInt (List.length model.suggestions))]
+        , p [class "info"] [ text ("Current place: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++  (String.fromFloat <| model.map.lng) )]
         , div []
             [ div [ id "map" ] []
             ]
