@@ -138,7 +138,7 @@ view model =
         , button [ onClick Reset ][ text "Reset" ]
         , dropdownView model
         , errorView model.error
-        , div [style "color" "#666"] [ text ("Total results:" ++ String.fromInt (List.length model.suggestions))]
+        , div [class "info"] [ text ("Total results: " ++ String.fromInt (List.length model.suggestions))]
         
         ]
 
