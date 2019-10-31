@@ -1,0 +1,53 @@
+{
+      "address_components" : [
+         {
+            "long_name" : "Forest Lane",
+            "short_name" : "Forest Ln",
+            "types" : [ "route" ]
+         },
+         {
+            "long_name" : "Dallas",
+            "short_name" : "Dallas",
+            "types" : [ "locality", "political" ]
+         },
+         {
+            "long_name" : "Dallas County",
+            "short_name" : "Dallas County",
+            "types" : [ "administrative_area_level_2", "political" ]
+         },
+         {
+            "long_name" : "Texas",
+            "short_name" : "TX",
+            "types" : [ "administrative_area_level_1", "political" ]
+         },
+         {
+            "long_name" : "United States",
+            "short_name" : "US",
+            "types" : [ "country", "political" ]
+         }
+      ],
+      "adr_address" : "\u003cspan class=\"street-address\"\u003eForest Ln\u003c/span\u003e, \u003cspan class=\"locality\"\u003eDallas\u003c/span\u003e, \u003cspan class=\"region\"\u003eTX\u003c/span\u003e, \u003cspan class=\"country-name\"\u003eUSA\u003c/span\u003e",
+      "formatted_address" : "Forest Ln, Dallas, TX, USA",
+      "geometry" : {
+         "location" : {
+            "lat" : 32.9092725,
+            "lng" : -96.7718618
+         },
+         "viewport" : {
+            "north" : 40.8617043802915,
+            "east" : -73.88857381970848,
+            "west" :  -73.8912717802915,
+            "south" : 40.8590064197085
+         }
+      },
+      "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/geocode-71.png",
+      "id" : "0483b9f72410d9c1134ad655bd81082a87354071",
+      "name" : "Forest Lane",
+      "place_id" : "EhpGb3Jlc3QgTG4sIERhbGxhcywgVFgsIFVTQSIuKiwKFAoSCWu8xN_wHUyGEb9Q5YEgd6qeEhQKEglLl0V79xlMhhGPZ0f2pJvsuQ",
+      "reference" : "EhpGb3Jlc3QgTG4sIERhbGxhcywgVFgsIFVTQSIuKiwKFAoSCWu8xN_wHUyGEb9Q5YEgd6qeEhQKEglLl0V79xlMhhGPZ0f2pJvsuQ",
+      "scope" : "GOOGLE",
+      "types" : [ "route" ],
+      "url" : "https://maps.google.com/?q=Forest+Ln,+Dallas,+TX,+USA&ftid=0x864c1df0dfc4bc6b:0x9eaa772081e550bf",
+      "utc_offset" : -300,
+      "vicinity" : "Dallas"
+   }
