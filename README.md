@@ -2,7 +2,7 @@
 ### Google places Autocomplete implementation with Elm.
 
 <kbd>
-  <img src="/shot.png?raw=true">
+  <img src="/shot1.png?raw=true">
 </kbd>
 
 
