@@ -16,14 +16,6 @@ body {
   color: #293c4b;
 }
 
-h1 {
-  font-size: 30px;
-}
-
-img {
-  margin: 20px 0;
-  max-width: 200px;
-}
 
 .error {
   background-color: #ea382a;
@@ -51,8 +43,6 @@ input {
     margin-right: 10px;
     border: 1px solid #ddd;
     font-size: 12px;
-
-
 }
 
 .info {
@@ -84,4 +74,8 @@ button {
   outline: none;
   border: 1px solid #ddd;
   margin: 10px 0;
+}
+
+#map {
+  width: 450px;
 }

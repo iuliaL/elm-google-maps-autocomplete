@@ -4,12 +4,13 @@ import Browser
 import ElmStreet.AutocompletePrediction exposing (AutocompletePrediction)
 import ElmStreet.Place exposing (ComponentType(..), Place)
 
-import Html exposing (Html, text, div, h1, img, button, input, span)
-import Html.Attributes exposing (src, style, placeholder, value, class)
+import Html exposing (Html, text, div, h1, img, button, input, span, p)
+import Html.Attributes exposing (src, style, placeholder, value, class, id)
 import Html.Events exposing (onInput, onClick)
 import Json.Decode as Decode
 
 import Ports exposing (..)
+import Map
 
 ---- MODEL ----
 
@@ -21,6 +22,7 @@ type alias Model =
     , preselectedPrediction: Maybe AutocompletePrediction
     , selectedPlace : Maybe Place
     , error: Maybe String
+    , map : Map.Model
     }
 
 initialState = { streetAddress = ""
@@ -29,12 +31,15 @@ initialState = { streetAddress = ""
    , preselectedPrediction = Nothing -- here I wanted to implement keyboard events but ...
    , selectedPlace = Nothing
    , error = Nothing
+   , map = Map.init
    }
 
 init : ( Model, Cmd Msg )
 init =
    ( initialState
-   , Cmd.none )
+   , Map.init
+        |> Map.toJsObject
+        |> Ports.initializeMap )
 
 
 
@@ -44,6 +49,7 @@ type Msg
     = Change String
     | AddressPredictions Decode.Value
     | DidSelectAddress String
+    | SetMapMarker Map.JsObject
     | AddressDetails String
     | Reset
     | NoOp
@@ -66,7 +72,12 @@ update msg model =
             , getPredictionDetails placeId
             )
 
-        -- here we decode the suggestion into a Place
+        SetMapMarker { lat, lng } ->
+            ( { model | map = Map.modify lat lng model.map }
+            , Cmd.none
+            )
+
+        -- here we decode the suggestion into a Place then call the map move and set the marker
         AddressDetails placeJson ->
             let
                 decodedResult =
@@ -77,7 +88,8 @@ update msg model =
                     ( { model | streetAddress = place.formattedAddress
                     , selectedPlace = Just place
                     , showMenu = False }
-                    , Cmd.none
+                    , moveMap { lat =  place.geometry.location.lat
+                    , lng = place.geometry.location.lng}
                     )
 
                 Err e ->
@@ -138,8 +150,12 @@ view model =
         , button [ onClick Reset ][ text "Reset" ]
         , dropdownView model
         , errorView model.error
-        , div [class "info"] [ text ("Total results: " ++ String.fromInt (List.length model.suggestions))]
-        
+        , p [class "info"] [ text ("Total results: " ++ String.fromInt (List.length model.suggestions))]
+        , p [class "info"] [ text ("Current place latitude: " ++ (String.fromFloat <| .lat <| Map.toJsObject model.map) )]
+        , p [class "info"] [ text ("Current place longitude: " ++ (String.fromFloat <| .lng <| Map.toJsObject model.map) )]
+        , div []
+            [ div [ id "map" ] []
+            ]
         ]
 
 
