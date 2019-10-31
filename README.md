@@ -5,6 +5,11 @@
   <img src="/shot1.png?raw=true">
 </kbd>
 
+### Quickstart
+
+```sh
+elm-app start
+```
 
 ### Resources
 1.  [Official Elm docs](https://guide.elm-lang.org/architecture/forms.html)
