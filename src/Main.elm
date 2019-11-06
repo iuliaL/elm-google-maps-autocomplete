@@ -1,8 +1,6 @@
 module Main exposing (..)
 
 import Browser
-import ElmStreet.AutocompletePrediction exposing (AutocompletePrediction)
-import ElmStreet.Place exposing (ComponentType(..), Place)
 import Html exposing (Html, button, div, h1, input, p, span, text)
 import Html.Attributes exposing (class, id, placeholder, src, style, value)
 import Html.Events exposing (onClick, onInput)
@@ -13,6 +11,18 @@ import Ports exposing (..)
 
 
 ---- MODEL ----
+
+
+type alias AutocompletePrediction =
+    { description : String
+    , placeId : String
+    }
+
+
+type alias Place =
+    { coordinates: Map.LatLng
+    , formattedAddress : String
+    }
 
 
 type alias Model =
@@ -40,8 +50,8 @@ initialState =
 init : ( Model, Cmd Msg )
 init =
     ( initialState
-    , Map.init
-        |> Ports.initializeMap
+    , Map.init -- set some initial position for the map
+        |> Ports.initializeMap -- create the map
     )
 
 
@@ -51,9 +61,9 @@ init =
 
 type Msg
     = Change String
-    | AddressPredictions Decode.Value
+    | GotAddressPredictions Decode.Value -- a value to decode
     | DidSelectAddress String
-    | AddressDetails String
+    | GotAddressDetails String
     | Reset
     | NoOp
 
@@ -81,26 +91,37 @@ update msg model =
             )
 
         -- here we decode the suggestion into a Place then call the map move and set the marker
-        AddressDetails placeJson ->
+        GotAddressDetails placeJson ->
             let
+                latLngDecoder =
+                    Decode.map2 Map.LatLng
+                        (Decode.field "lat" Decode.float)
+                        (Decode.field "lng" Decode.float)
+
+                placeDecoder : Decode.Decoder Place
+                placeDecoder =
+                    Decode.map2 Place
+                        (Decode.field "geometry"
+                            (Decode.field "location"
+                                latLngDecoder
+                            )
+                        )
+                        (Decode.field "formatted_address" Decode.string)
+
                 decodedResult : Result Decode.Error Place
                 decodedResult =
-                    Decode.decodeString ElmStreet.Place.decoder placeJson
+                    Decode.decodeString placeDecoder placeJson
             in
             case decodedResult of
                 Ok place ->
-                    let
-                        { lat, lng } =
-                            place.geometry.location
-                    in
                     ( { model
                         | streetAddress = place.formattedAddress
                         , selectedPlace = Just place
                         , showMenu = False
                         , suggestions = []
-                        , map = Map.modify lat lng model.map
+                        , map = Map.modify place.coordinates model.map
                       }
-                    , setPlace { lat = lat, lng = lng }
+                    , setPlace place.coordinates
                     )
 
                 Err e ->
@@ -112,12 +133,22 @@ update msg model =
                     , Ports.logger ("Got an error decoding place:" ++ error)
                     )
 
-        --  here we get the google predictions
-        AddressPredictions predictions ->
+        --  here we get the google predictions and we decode them
+        GotAddressPredictions predictions ->
             let
+                predictionDecoder : Decode.Decoder AutocompletePrediction
+                predictionDecoder =
+                    Decode.map2 AutocompletePrediction
+                        (Decode.field "description" Decode.string)
+                        (Decode.field "place_id" Decode.string)
+
+                decodePredictionList : Decode.Decoder (List AutocompletePrediction)
+                decodePredictionList =
+                    Decode.list predictionDecoder
+
                 decodedPredictions : Result Decode.Error (List AutocompletePrediction)
                 decodedPredictions =
-                    Decode.decodeValue ElmStreet.AutocompletePrediction.decodeList predictions
+                    Decode.decodeValue decodePredictionList predictions
 
                 -- this comes from js interop
             in
@@ -205,8 +236,8 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Ports.addressPredictions AddressPredictions
-        , Ports.addressDetails AddressDetails
+        [ Ports.addressPredictions GotAddressPredictions
+        , Ports.addressDetails GotAddressDetails
         ]
 
 

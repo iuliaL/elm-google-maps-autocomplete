@@ -1,10 +1,14 @@
 module Map exposing (..)
 
 
-type alias Model =
+type alias LatLng =
     { lat : Float
     , lng : Float
     }
+
+
+type alias Model =
+    LatLng
 
 
 init : Model
@@ -14,9 +18,9 @@ init =
     }
 
 
-modify : Float -> Float -> Model -> Model
-modify lat lng model =
+modify : LatLng -> Model -> Model
+modify coordinates model =
     { model
-        | lat = lat
-        , lng = lng
+        | lat = coordinates.lat
+        , lng = coordinates.lng
     }
