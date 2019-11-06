@@ -65,19 +65,19 @@ update msg model =
             ( model, Cmd.none )
 
         Reset ->
-            ( initialState, logger "Input was reset" )
+            ( initialState, Ports.logger "Input was reset" )
 
         Change text ->
             ( { model
                 | streetAddress = text
                 , selectedPlace = Nothing
               }
-            , predictAddress text
+            , Ports.predictAddress text
             )
 
         DidSelectAddress placeId ->
             ( model
-            , getPredictionDetails placeId
+            , Ports.getPredictionDetails placeId
             )
 
         -- here we decode the suggestion into a Place then call the map move and set the marker
@@ -109,7 +109,7 @@ update msg model =
                             Decode.errorToString e
                     in
                     ( { model | error = Just error }
-                    , logger ("Got an error decoding place:" ++ error)
+                    , Ports.logger ("Got an error decoding place:" ++ error)
                     )
 
         --  here we get the google predictions
@@ -133,7 +133,7 @@ update msg model =
                             Decode.errorToString e
                     in
                     ( { model | error = Just error }
-                    , logger ("Got an error decoding predictions:" ++ error)
+                    , Ports.logger ("Got an error decoding predictions:" ++ error)
                     )
 
 
@@ -205,8 +205,8 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ addressPredictions AddressPredictions
-        , addressDetails AddressDetails
+        [ Ports.addressPredictions AddressPredictions
+        , Ports.addressDetails AddressDetails
         ]
 
 
