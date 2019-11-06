@@ -1,14 +1,19 @@
 port module Ports exposing (..)
 
 import Json.Decode as Decode
-
 import Map
+
+
 
 -- Console logging
 
+
 port logger : String -> Cmd msg
 
+
+
 -- Outgoing Ports
+
 
 port predictAddress : String -> Cmd msg
 
@@ -16,7 +21,9 @@ port predictAddress : String -> Cmd msg
 port addressPredictions : (Decode.Value -> msg) -> Sub msg
 
 
-port getPredictionDetails : String -> Cmd msg -- send 
+port getPredictionDetails :
+    String
+    -> Cmd msg -- send
 
 
 port addressDetails : (String -> msg) -> Sub msg
