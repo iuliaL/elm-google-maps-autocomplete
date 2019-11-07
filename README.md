@@ -25,8 +25,5 @@ for bootstraping
 
 This project is bootstrapped with [Create Elm App](https://github.com/halfzebra/create-elm-app).
 
-## Todo
-- support keyboard events
-- support submit form
 
 
