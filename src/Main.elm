@@ -1,6 +1,8 @@
 module Main exposing (..)
 
+import Array
 import Browser
+import Browser.Events
 import Html exposing (Html, button, div, h1, input, p, span, text)
 import Html.Attributes exposing (class, id, placeholder, src, style, value)
 import Html.Events exposing (onClick, onInput)
@@ -20,16 +22,21 @@ type alias AutocompletePrediction =
 
 
 type alias Place =
-    { coordinates: Map.LatLng
+    { coordinates : Map.LatLng
     , formattedAddress : String
     }
 
+type Key
+    = Up
+    | Down
+    | Enter
+    | Other
 
 type alias Model =
     { streetAddress : String
     , suggestions : List AutocompletePrediction
     , showMenu : Bool
-    , preselectedPrediction : Maybe AutocompletePrediction
+    , selectedIndex : Int
     , selectedPlace : Maybe Place
     , error : Maybe String
     , map : Map.Model
@@ -40,7 +47,7 @@ initialState =
     { streetAddress = ""
     , suggestions = []
     , showMenu = False
-    , preselectedPrediction = Nothing -- here I wanted to implement keyboard events but ...
+    , selectedIndex = 0
     , selectedPlace = Nothing
     , error = Nothing
     , map = Map.init
@@ -50,8 +57,10 @@ initialState =
 init : ( Model, Cmd Msg )
 init =
     ( initialState
-    , Map.init -- set some initial position for the map
-        |> Ports.initializeMap -- create the map
+    , Map.init
+        -- set some initial position for the map
+        |> Ports.initializeMap
+      -- create the map
     )
 
 
@@ -63,6 +72,7 @@ type Msg
     = Change String
     | GotAddressPredictions Decode.Value -- a value to decode
     | DidSelectAddress String
+    | KeyPress Key
     | GotAddressDetails String
     | Reset
     | NoOp
@@ -84,6 +94,49 @@ update msg model =
               }
             , Ports.predictAddress text
             )
+
+        KeyPress key ->
+            case key of
+                Down ->
+                    let
+                        newSelectedIndex =
+                            if model.selectedIndex + 1 == List.length model.suggestions then
+                                0
+                                -- start from the beginning
+
+                            else
+                                model.selectedIndex + 1
+                    in
+                    ( { model | selectedIndex = newSelectedIndex }, Cmd.none )
+
+                Up ->
+                   let
+                        newSelectedIndex =
+                            if model.selectedIndex - 1 == -1 then List.length model.suggestions - 1
+                                -- start from the end
+
+                            else
+                                model.selectedIndex - 1
+                    in
+                    ( { model | selectedIndex = newSelectedIndex }, Cmd.none )
+
+                Enter ->
+                    let
+                        myArray =
+                            Array.fromList model.suggestions
+
+                        myItem =
+                            Array.get model.selectedIndex myArray
+                    in
+                    case myItem of
+                        Just item ->
+                            ( model, Ports.getPredictionDetails item.placeId )
+
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                Other ->
+                    ( model, Ports.logger "Pressed a key with no binding" )
 
         DidSelectAddress placeId ->
             ( model
@@ -119,6 +172,7 @@ update msg model =
                         , selectedPlace = Just place
                         , showMenu = False
                         , suggestions = []
+                        , selectedIndex = 0
                         , map = Map.modify place.coordinates model.map
                       }
                     , setPlace place.coordinates
@@ -168,14 +222,45 @@ update msg model =
                     )
 
 
+keyDecoder : Decode.Decoder Msg
+keyDecoder =
+    Decode.field "key" Decode.string
+        |> Decode.map toKeyPressed
+
+
+toKeyPressed : String -> Msg
+toKeyPressed key =
+    case key of
+        "ArrowUp" ->
+            KeyPress Up
+
+        "ArrowDown" ->
+            KeyPress Down
+
+        "Enter" ->
+            KeyPress Enter
+
+        _ ->
+            KeyPress Other
+
+
 
 ---- VIEW ----
 
 
-addressView : AutocompletePrediction -> Html Msg
-addressView suggestion =
+addressView : AutocompletePrediction -> Bool -> Html Msg
+addressView suggestion isSelected =
+    let
+        suggestionBg =
+            if isSelected then
+                "#36aee6a1"
+
+            else
+                ""
+    in
     div
         [ onClick (DidSelectAddress suggestion.placeId) -- here DidSelectAddress acts as a dispathcer of the Msg
+        , style "background" suggestionBg
         ]
         [ text suggestion.description ]
 
@@ -192,9 +277,12 @@ errorView error =
 
 
 dropdownView : Model -> Html Msg
-dropdownView model =
-    if model.showMenu then
-        div [ class "dropdown" ] (List.map addressView model.suggestions)
+dropdownView { suggestions, selectedIndex, showMenu } =
+    if showMenu then
+        div
+            [ class "dropdown"]
+            (List.indexedMap (\index item -> addressView item <| index == selectedIndex) suggestions)
+        -- (List.map addressView model.suggestions)
 
     else
         span [] []
@@ -238,7 +326,9 @@ subscriptions model =
     Sub.batch
         [ Ports.addressPredictions GotAddressPredictions
         , Ports.addressDetails GotAddressDetails
+        , Browser.Events.onKeyDown keyDecoder
         ]
+
 
 
 main : Program () Model Msg
