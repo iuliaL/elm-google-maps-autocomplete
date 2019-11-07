@@ -26,11 +26,13 @@ type alias Place =
     , formattedAddress : String
     }
 
+
 type Key
     = Up
     | Down
     | Enter
     | Other
+
 
 type alias Model =
     { streetAddress : String
@@ -110,9 +112,10 @@ update msg model =
                     ( { model | selectedIndex = newSelectedIndex }, Cmd.none )
 
                 Up ->
-                   let
+                    let
                         newSelectedIndex =
-                            if model.selectedIndex - 1 == -1 then List.length model.suggestions - 1
+                            if model.selectedIndex - 1 == -1 then
+                                List.length model.suggestions - 1
                                 -- start from the end
 
                             else
@@ -280,7 +283,7 @@ dropdownView : Model -> Html Msg
 dropdownView { suggestions, selectedIndex, showMenu } =
     if showMenu then
         div
-            [ class "dropdown"]
+            [ class "dropdown" ]
             (List.indexedMap (\index item -> addressView item <| index == selectedIndex) suggestions)
         -- (List.map addressView model.suggestions)
 
@@ -303,13 +306,18 @@ view : Model -> Html Msg
 view model =
     div [ class "view" ]
         [ div [ class "dropdown-wrapper" ]
-            [ input [ placeholder "Search...", value model.streetAddress, onInput Change ] []
+            [ input
+                [ placeholder "Search..."
+                , value model.streetAddress
+                , onInput Change
+                , Html.Events.preventDefaultOn "keydown" decodeIfKeyUpOrDown
+                ]
+                []
             , dropdownView model
             ]
         , button [ onClick Reset ] [ text "Reset" ]
         , errorView model.error
 
-        -- , p [class "info"] [ text ("Total results: " ++ String.fromInt (List.length model.suggestions))]
         , placeInfoView model
         , div []
             [ div [ id "map" ] []
@@ -317,6 +325,17 @@ view model =
         ]
 
 
+decodeIfKeyUpOrDown : Decode.Decoder ( Msg, Bool )
+decodeIfKeyUpOrDown =
+    Decode.field "key" Decode.string
+        |> Decode.map
+            (\key ->
+                ( NoOp, preventDefault key )
+            )
+
+
+preventDefault key =
+    key == "ArrowUp" || key == "ArrowDown"
 
 ---- PROGRAM ----
 
@@ -328,7 +347,6 @@ subscriptions model =
         , Ports.addressDetails GotAddressDetails
         , Browser.Events.onKeyDown keyDecoder
         ]
-
 
 
 main : Program () Model Msg
