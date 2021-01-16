@@ -37,7 +37,7 @@ type Key
 type alias Model =
     { streetAddress : String
     , suggestions : List AutocompletePrediction
-    , showMenu : Bool
+    , showDropdown : Bool
     , selectedIndex : Int
     , selectedPlace : Maybe Place
     , error : Maybe String
@@ -45,10 +45,11 @@ type alias Model =
     }
 
 
+initialState : Model
 initialState =
     { streetAddress = ""
     , suggestions = []
-    , showMenu = False
+    , showDropdown = False
     , selectedIndex = 0
     , selectedPlace = Nothing
     , error = Nothing
@@ -173,7 +174,7 @@ update msg model =
                     ( { model
                         | streetAddress = place.formattedAddress
                         , selectedPlace = Just place
-                        , showMenu = False
+                        , showDropdown = False
                         , suggestions = []
                         , selectedIndex = 0
                         , map = Map.modify place.coordinates model.map
@@ -211,7 +212,7 @@ update msg model =
             in
             case decodedPredictions of
                 Ok suggestions ->
-                    ( { model | suggestions = suggestions, showMenu = True }
+                    ( { model | suggestions = suggestions, showDropdown = True }
                     , Cmd.none
                     )
 
@@ -280,12 +281,13 @@ errorView error =
 
 
 dropdownView : Model -> Html Msg
-dropdownView { suggestions, selectedIndex, showMenu } =
-    if showMenu then
+dropdownView { suggestions, selectedIndex, showDropdown } =
+    if showDropdown then
         div
             [ class "dropdown" ]
-            (List.indexedMap (\index item -> addressView item <| index == selectedIndex) suggestions)
-        -- (List.map addressView model.suggestions)
+            (suggestions
+                |> List.indexedMap (\index item -> addressView item (index == selectedIndex))
+            )
 
     else
         span [] []
@@ -295,11 +297,11 @@ placeInfoView : Model -> Html Msg
 placeInfoView model =
     case model.selectedPlace of
         Just place ->
-            p [ class "info" ] [ text ("Current place: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++ (String.fromFloat <| model.map.lng)) ]
+            p [ class "info" ] [ text ("Current place: " ++ String.fromFloat model.map.lat ++ ", " ++ String.fromFloat model.map.lng) ]
 
         Nothing ->
             p [ class "info", style "visibility" "hidden" ]
-                [ text ("Current coordinates: " ++ (String.fromFloat <| model.map.lat) ++ ", " ++ (String.fromFloat <| model.map.lng)) ]
+                [ text ("Current coordinates: " ++ String.fromFloat model.map.lat ++ ", " ++ String.fromFloat model.map.lng) ]
 
 
 view : Model -> Html Msg
@@ -317,7 +319,6 @@ view model =
             ]
         , button [ onClick Reset ] [ text "Reset" ]
         , errorView model.error
-
         , placeInfoView model
         , div []
             [ div [ id "map" ] []
@@ -334,8 +335,11 @@ decodeIfKeyUpOrDown =
             )
 
 
+preventDefault : String -> Bool
 preventDefault key =
     key == "ArrowUp" || key == "ArrowDown"
+
+
 
 ---- PROGRAM ----
 
